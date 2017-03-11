@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="membership_protocol"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j2 -f &quot;/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j2 -f &quot;/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j2 -f &quot;/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j2 -f &quot;/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j2 -f &quot;/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j2 -f &quot;/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j2 -f &quot;/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j2 -f &quot;/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j2 -f &quot;/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j2 -f &quot;/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j2 -f &quot;/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j2 -f &quot;/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="membership_protocol">
+				<Option output="/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/cmake-build-debug/membership_protocol" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/bin/../lib/clang/8.0.0/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/bin/../include/c++/v1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j2 -f &quot;/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/cmake-build-debug/Makefile&quot;  VERBOSE=1 membership_protocol"/>
+					<CompileFile command="/usr/bin/make -j2 -f &quot;/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j2 -f &quot;/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j2 -f &quot;/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="membership_protocol/fast">
+				<Option output="/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/cmake-build-debug/membership_protocol" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/bin/../lib/clang/8.0.0/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/bin/../include/c++/v1"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j2 -f &quot;/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/cmake-build-debug/Makefile&quot;  VERBOSE=1 membership_protocol/fast"/>
+					<CompileFile command="/usr/bin/make -j2 -f &quot;/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j2 -f &quot;/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j2 -f &quot;/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/mp1/Application.cpp">
+			<Option target="membership_protocol"/>
+		</Unit>
+		<Unit filename="/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/mp1/Application.h">
+			<Option target="membership_protocol"/>
+		</Unit>
+		<Unit filename="/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/mp1/EmulNet.cpp">
+			<Option target="membership_protocol"/>
+		</Unit>
+		<Unit filename="/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/mp1/EmulNet.h">
+			<Option target="membership_protocol"/>
+		</Unit>
+		<Unit filename="/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/mp1/Log.cpp">
+			<Option target="membership_protocol"/>
+		</Unit>
+		<Unit filename="/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/mp1/Log.h">
+			<Option target="membership_protocol"/>
+		</Unit>
+		<Unit filename="/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/mp1/MP1Node.cpp">
+			<Option target="membership_protocol"/>
+		</Unit>
+		<Unit filename="/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/mp1/MP1Node.h">
+			<Option target="membership_protocol"/>
+		</Unit>
+		<Unit filename="/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/mp1/Member.cpp">
+			<Option target="membership_protocol"/>
+		</Unit>
+		<Unit filename="/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/mp1/Member.h">
+			<Option target="membership_protocol"/>
+		</Unit>
+		<Unit filename="/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/mp1/Params.cpp">
+			<Option target="membership_protocol"/>
+		</Unit>
+		<Unit filename="/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/mp1/Params.h">
+			<Option target="membership_protocol"/>
+		</Unit>
+		<Unit filename="/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/mp1/Queue.h">
+			<Option target="membership_protocol"/>
+		</Unit>
+		<Unit filename="/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/mp1/stdincludes.h">
+			<Option target="membership_protocol"/>
+		</Unit>
+		<Unit filename="/Users/justintumale/Desktop/_TECH/GitHub/membership_protocol/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

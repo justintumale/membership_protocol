@@ -70,6 +70,8 @@ public:
 	void nodeLoop();
 	void checkMessages();
 	bool recvCallBack(void *env, char *data, int size);
+	bool joinReqHandler(void *env, char *data, int size);
+	bool joinRepHandler(void *env, char *data, int size);
 	void nodeLoopOps();
 	int isNullAddress(Address *addr);
 	Address getJoinAddress();

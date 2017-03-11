@@ -218,7 +218,57 @@ bool MP1Node::recvCallBack(void *env, char *data, int size ) {
 	/*
 	 * Your code goes here
 	 */
+    MessageHdr* messageHdr = (MessageHdr*) data;
+    MsgTypes msgType = messageHdr->msgType;
+    if (msgType == JOINREQ) {
+        cout << "JOINREQ -----------------" << endl;
+        return joinReqHandler(env, data+sizeof(MessageHdr), size); //no need for the msgType anymore, so move address right
+    } else if (msgType == JOINREP) {
+        cout << "JOINREP -----------------" << endl;
+        return joinRepHandler(env, data+sizeof(MessageHdr), size); //no need for the msgType anymore, so move address right
+    } else {
+        cout << "other ---------" << endl;
+        return false;
+    }
 }
+
+/**
+ * FUNCTION NAME: joinReqHandler
+ *
+ * DESCRIPTION: Handler for JOINREQ messages
+ */
+bool MP1Node::joinReqHandler(void *env, char *data, int size) {
+    //Get requester information
+        //message structure ---> MsgType, address, heartbeat
+    Address requesterAddress;
+    memcpy(requesterAddress.addr, data, sizeof(getMemberNode()->addr));
+        cout << "" << endl;
+        cout << "requesterAddress: ";
+        cout << requesterAddress.getAddress() << endl;
+    long heartbeat;
+    memcpy(&heartbeat, data+sizeof(getMemberNode()->addr), sizeof(long));
+        //cout << "heartbeat: ";
+        //cout<< heartbeat << endl;
+
+    //TODO Update membership list
+    //updateMembershipList();
+
+    //TODO Multicast membership list
+    //broadcastMembershipList();
+
+
+}
+
+
+/**
+ * FUNCTION NAME: joinRepHandler
+ *
+ * DESCRIPTION: Handler for JOINREP messages
+ */
+bool MP1Node::joinRepHandler(void *env, char *data, int size) {
+
+}
+
 
 /**
  * FUNCTION NAME: nodeLoopOps
