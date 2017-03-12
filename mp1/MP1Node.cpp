@@ -251,10 +251,20 @@ bool MP1Node::joinReqHandler(void *env, char *data, int size) {
         //cout<< heartbeat << endl;
 
     //TODO Update membership list
-    //updateMembershipList();
+    //memberListEntries will be updated. They require an id (int), port (short), heartbeat (long), and ts (long)
+    //get the id and port from the data
+    //int id = *(int*)(data  + sizeof(getMemberNode()->addr) + sizeof(long)); //??
+    string reqAddStr = (requesterAddress.getAddress());
+    size_t pos = reqAddStr.find(":");
+    int id = stoi(reqAddStr.substr(0, pos));
+    short port = (short)stoi(reqAddStr.substr(pos + 1, reqAddStr.size()-pos-1));
 
-    //TODO Multicast membership list
-    //broadcastMembershipList();
+    updateMembershipList(id, port, heartbeat);
+
+    //MemberListEntry::MemberListEntry(int id, short port, long heartbeat, long timestamp): id(id), port(port), heartbeat(heartbeat), timestamp(timestamp)
+
+    //TODO send membership list
+    sendMembershipList(id, port, heartbeat);
 
 
 }
@@ -266,6 +276,42 @@ bool MP1Node::joinReqHandler(void *env, char *data, int size) {
  * DESCRIPTION: Handler for JOINREP messages
  */
 bool MP1Node::joinRepHandler(void *env, char *data, int size) {
+
+}
+
+/**
+ * FUNCTION NAME: updateMembershipList
+ *
+ * DESCRIPTION: update the membership list with the new joiner and update heartbeats
+ */
+void MP1Node::updateMembershipList(int id, short port, long heartbeat) {
+    cout << "updating memberlist" << endl;
+    int sizeOfMemberList = this->memberNode->memberList.size();
+    cout << "size of membership list: "; cout << sizeOfMemberList << endl;
+    for (int i = 0; i < sizeOfMemberList; i++) {
+        if (heartbeat > memberNode->memberList[i].getheartbeat()) {
+            cout << "setting [ id: ";
+            cout << memberNode->memberList[i].getid();
+            cout << " port: ";
+            cout << memberNode->memberList[i].getport();
+            cout << " ] to timestamp: ";
+            cout << par->getcurrtime() << endl;
+            memberNode->memberList[i].setheartbeat(heartbeat);
+            memberNode->memberList[i].settimestamp(par->getcurrtime());
+        } else {
+            cout << "no heartbeat updates." << endl;
+        }
+    }
+    MemberListEntry entry(id, port, heartbeat, par->getcurrtime());
+    memberNode->memberList.push_back(entry);
+}
+
+/**
+ * FUNCTION NAME: sendMembershipList
+ *
+ * DESCRIPTION: send a membership list to a node
+ */
+void MP1Node::sendMembershipList(int id, short port, long heartbeat) {
 
 }
 

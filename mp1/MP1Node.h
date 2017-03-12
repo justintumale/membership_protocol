@@ -72,6 +72,8 @@ public:
 	bool recvCallBack(void *env, char *data, int size);
 	bool joinReqHandler(void *env, char *data, int size);
 	bool joinRepHandler(void *env, char *data, int size);
+	void updateMembershipList(int id, short port, long heartbeat);
+	void sendMembershipList(int id, short port, long heartbeat);
 	void nodeLoopOps();
 	int isNullAddress(Address *addr);
 	Address getJoinAddress();
