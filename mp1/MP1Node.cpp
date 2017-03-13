@@ -312,7 +312,6 @@ void MP1Node::updateMembershipList(int id, short port, long heartbeat) {
  * DESCRIPTION: send a membership list to a node
  */
 void MP1Node::sendMembershipList(int id, short port, long heartbeat, Address *to) {
-
     /*Memberlist entry structure:
      * int id, short port, long heartbeat, long timestamp
      */
@@ -347,27 +346,24 @@ void MP1Node::sendMembershipList(int id, short port, long heartbeat, Address *to
         char* dataIndex= data+1+sizeof(getMemberNode()->addr.addr) + sizeof(long);
 
         //use iterator to 1. erase failed entries and 2. populate data to be sent
-        /*
-        for (vector<MemberListEntry>::iterator iterator = memberNode->memberList.begin(); iterator != memberNode->memberList.end();) {
+
+        for (vector<MemberListEntry>::iterator iterator = memberNode->memberList.begin(); iterator != memberNode->memberList.end(); iterator++) {
             if ((par->getcurrtime() - iterator->gettimestamp()) > TREMOVE) { //failed node must be removed
                 iterator = memberNode->memberList.erase(iterator);
                 numberOfMembers--;
                 continue;
             }
-            //if ((par->getcurrtime() - iterator->gettimestamp()) > TFAIL) { //mark node as failed. ???
-              //  continue;
-            //}
+            if ((par->getcurrtime() - iterator->gettimestamp()) > TFAIL) { //mark node as failed. ???
+                continue;
+            }
 
-            //memcpy(dataIndex, &iterator->id, sizeof(int));
-            //memcpy(dataIndex + sizeof(int), &iterator->port, sizeof(short));
-            //memcpy(dataIndex + sizeof(int) + sizeof(short), &iterator->heartbeat, sizeof(long));
-            //dataIndex = dataIndex + sizeof(int) + sizeof(short) + sizeof(long);
+            memcpy(dataIndex, &iterator->id, sizeof(int));
+            memcpy(dataIndex + sizeof(int), &iterator->port, sizeof(short));
+            memcpy(dataIndex + sizeof(int) + sizeof(short), &iterator->heartbeat, sizeof(long));
+            dataIndex = dataIndex + sizeof(int) + sizeof(short) + sizeof(long);
         }
         cout << "end loop" << endl;
-        //emulNet->ENsend(&memberNode->addr, to, (char *)msg, msgsize);
-         */
-
-
+        emulNet->ENsend(&memberNode->addr, to, (char *)msg, msgsize);
 }
 
 /**
