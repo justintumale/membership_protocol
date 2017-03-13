@@ -264,7 +264,7 @@ bool MP1Node::joinReqHandler(void *env, char *data, int size) {
     //MemberListEntry::MemberListEntry(int id, short port, long heartbeat, long timestamp): id(id), port(port), heartbeat(heartbeat), timestamp(timestamp)
 
     //TODO send membership list
-    sendMembershipList(id, port, heartbeat);
+    sendMembershipList(id, port, heartbeat, &requesterAddress);
 
 
 }
@@ -311,10 +311,64 @@ void MP1Node::updateMembershipList(int id, short port, long heartbeat) {
  *
  * DESCRIPTION: send a membership list to a node
  */
-void MP1Node::sendMembershipList(int id, short port, long heartbeat) {
+void MP1Node::sendMembershipList(int id, short port, long heartbeat, Address *to) {
+
+    /*Memberlist entry structure:
+     * int id, short port, long heartbeat, long timestamp
+     */
+
+
+    /* this is how messages are created and sent:
+     *
+     *  size_t msgsize = sizeof(MessageHdr) + sizeof(joinaddr->addr) + sizeof(long) + 1;
+        msg = (MessageHdr *) malloc(msgsize * sizeof(char));
+
+        // create JOINREQ message: format of data is {struct Address myaddr}
+        msg->msgType = JOINREQ;
+        memcpy((char *)(msg+1), &memberNode->addr.addr, sizeof(memberNode->addr.addr));
+        memcpy((char *)(msg+1) + 1 + sizeof(memberNode->addr.addr), &memberNode->heartbeat, sizeof(long));
+
+        // send JOINREQ message to introducer member
+        emulNet->ENsend(&memberNode->addr, joinaddr, (char *)msg, msgsize);
+     *
+     */
+        //message size
+        long numberOfMembers = memberNode->memberList.size();
+        size_t msgsize = sizeof(MessageHdr) + sizeof(getMemberNode()->addr.addr) + sizeof(long)
+                         + numberOfMembers * ( sizeof(int) + sizeof(short) + sizeof(long));
+
+        //allocate MessageHdr with message size
+        MessageHdr* msg = (MessageHdr*) malloc(msgsize);
+
+        //allocate data
+        char* data = (char*) msg;
+        memcpy(data+1, getMemberNode()->addr.addr, sizeof(getMemberNode()->addr.addr));            //address
+        memcpy(data+1+sizeof(getMemberNode()->addr.addr), &memberNode->heartbeat, sizeof(long));   //heartbeat
+        char* dataIndex= data+1+sizeof(getMemberNode()->addr.addr) + sizeof(long);
+
+        //use iterator to 1. erase failed entries and 2. populate data to be sent
+        /*
+        for (vector<MemberListEntry>::iterator iterator = memberNode->memberList.begin(); iterator != memberNode->memberList.end();) {
+            if ((par->getcurrtime() - iterator->gettimestamp()) > TREMOVE) { //failed node must be removed
+                iterator = memberNode->memberList.erase(iterator);
+                numberOfMembers--;
+                continue;
+            }
+            //if ((par->getcurrtime() - iterator->gettimestamp()) > TFAIL) { //mark node as failed. ???
+              //  continue;
+            //}
+
+            //memcpy(dataIndex, &iterator->id, sizeof(int));
+            //memcpy(dataIndex + sizeof(int), &iterator->port, sizeof(short));
+            //memcpy(dataIndex + sizeof(int) + sizeof(short), &iterator->heartbeat, sizeof(long));
+            //dataIndex = dataIndex + sizeof(int) + sizeof(short) + sizeof(long);
+        }
+        cout << "end loop" << endl;
+        //emulNet->ENsend(&memberNode->addr, to, (char *)msg, msgsize);
+         */
+
 
 }
-
 
 /**
  * FUNCTION NAME: nodeLoopOps
@@ -373,5 +427,5 @@ void MP1Node::initMemberListTable(Member *memberNode) {
 void MP1Node::printAddress(Address *addr)
 {
     printf("%d.%d.%d.%d:%d \n",  addr->addr[0],addr->addr[1],addr->addr[2],
-                                                       addr->addr[3], *(short*)&addr->addr[4]) ;    
+                                                       addr->addr[3], *(short*)&addr->addr[4]) ;
 }
