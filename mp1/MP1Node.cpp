@@ -297,21 +297,33 @@ bool MP1Node::joinRepHandler(void *env, char *data, int size) {
         memberNode->memberList.clear();
     }
 
+    MemberListEntry entry;
+
     for (int i = 0; i < numberOfEntries; i++) {
         int id;
         short port;
         long heartbeat;
         int timestamp;
+
+        /*
         memcpy(&id, data, sizeof(int));
         memcpy(&port, data + sizeof(int), sizeof(port));
         memcpy(&heartbeat, data + sizeof(int) + sizeof(port), sizeof(long));    //<--- are these what was sent in sendMembershipList?
         memcpy(&timestamp, data + sizeof(int) + sizeof(port) + sizeof(long), sizeof(long)); //<--should this be local time?
 
         MemberListEntry entry(id, port, heartbeat, timestamp);
+        */
+
+        memcpy(&entry.id, data, sizeof(int));
+        memcpy(&entry.port, data + sizeof(int), sizeof(port));
+        memcpy(&entry.heartbeat, data + sizeof(int) + sizeof(port), sizeof(long));
+        entry.timestamp = par->getcurrtime();
+
         memberNode->memberList.push_back((entry));
 
+
         if (i != numberOfEntries - 1) {
-            data = data + sizeof(int) + sizeof(port) + sizeof(long) + sizeof(long);
+            data = data + sizeof(int) + sizeof(port) + sizeof(long);
         }
     }
     cout << "memberNode->memberList.size() ";
