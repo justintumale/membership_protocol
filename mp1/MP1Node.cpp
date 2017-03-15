@@ -277,6 +277,7 @@ bool MP1Node::joinReqHandler(void *env, char *data, int size) {
  * DESCRIPTION: Handler for JOINREP messages
  */
 bool MP1Node::joinRepHandler(void *env, char *data, int size) {
+    cout << "start joinRepHandler..." << endl;
     //1. extract data from *data
 
     //get Address from *data
@@ -290,6 +291,12 @@ bool MP1Node::joinRepHandler(void *env, char *data, int size) {
     //get members and put them into own list
         //what is the size?
     int numberOfEntries = size / ( sizeof(int) + sizeof(short) + sizeof(long) );
+
+    //clear vector if not empty, since nodes being introduced/reintroduced should be empty
+    if (memberNode->memberList.size() > 0) {
+        memberNode->memberList.clear();
+    }
+
     for (int i = 0; i < numberOfEntries; i++) {
         int id;
         short port;
@@ -298,15 +305,25 @@ bool MP1Node::joinRepHandler(void *env, char *data, int size) {
         memcpy(&id, data, sizeof(int));
         memcpy(&port, data + sizeof(int), sizeof(port));
         memcpy(&heartbeat, data + sizeof(int) + sizeof(port), sizeof(long));    //<--- are these what was sent in sendMembershipList?
-        memcpy(&timestamp, data + sizeof(int) + sizeof(port) + sizeof(long), sizeof(int)); //<--should this be local time?
+        memcpy(&timestamp, data + sizeof(int) + sizeof(port) + sizeof(long), sizeof(long)); //<--should this be local time?
 
         MemberListEntry entry(id, port, heartbeat, timestamp);
         memberNode->memberList.push_back((entry));
+
+        if (i != numberOfEntries - 1) {
+            data = data + sizeof(int) + sizeof(port) + sizeof(long) + sizeof(long);
+        }
+    }
+    cout << "memberNode->memberList.size() ";
+    cout << memberNode->memberList.size() << endl;
+    cout << "printing contents of current node's membership list ..." << endl;
+
+
+    for (int i = 0; i < numberOfEntries; i++) {
+        cout << memberNode->memberList[i].getid() << endl;
     }
 
-
-
-    //2. updateMembershipList
+    cout << "...end joinRepHandler." << endl;
     return true;
 }
 
@@ -320,7 +337,10 @@ void MP1Node::updateMembershipList(int id, short port, long heartbeat) {
     int sizeOfMemberList = this->memberNode->memberList.size();
     cout << "size of membership list: "; cout << sizeOfMemberList << endl;
     for (int i = 0; i < sizeOfMemberList; i++) {
-        if (heartbeat > memberNode->memberList[i].getheartbeat()) {
+        cout << "heartbeat ";
+        cout << heartbeat << endl;
+        cout << memberNode->memberList[i].getheartbeat();
+        if (heartbeat >= memberNode->memberList[i].getheartbeat()) {
             cout << "setting [ id: ";
             cout << memberNode->memberList[i].getid();
             cout << " port: ";
@@ -343,6 +363,7 @@ void MP1Node::updateMembershipList(int id, short port, long heartbeat) {
  * DESCRIPTION: send a membership list to a node
  */
 void MP1Node::sendMembershipList(int id, short port, long heartbeat, Address *to, enum MsgTypes msgType) {
+    cout << "start sendMembershipList ..." << endl;
     /*Memberlist entry structure:
      * int id, short port, long heartbeat, long timestamp
      */
@@ -387,13 +408,14 @@ void MP1Node::sendMembershipList(int id, short port, long heartbeat, Address *to
         if ((par->getcurrtime() - iterator->gettimestamp()) > TFAIL) { //mark node as failed. ???
             continue;
         }
-
+        cout << " id to be sent: ";
+        cout << iterator->id << endl;
         memcpy(dataIndex, &iterator->id, sizeof(int));
         memcpy(dataIndex + sizeof(int), &iterator->port, sizeof(short));
         memcpy(dataIndex + sizeof(int) + sizeof(short), &iterator->heartbeat, sizeof(long));
         dataIndex = dataIndex + sizeof(int) + sizeof(short) + sizeof(long);
     }
-    cout << "end loop" << endl;
+    cout << "...end sendMembershipList." << endl;
 
     emulNet->ENsend(&memberNode->addr, to, (char *)msg, msgsize);
     free(msg);
