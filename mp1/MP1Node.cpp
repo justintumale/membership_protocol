@@ -278,6 +278,34 @@ bool MP1Node::joinReqHandler(void *env, char *data, int size) {
  */
 bool MP1Node::joinRepHandler(void *env, char *data, int size) {
     //1. extract data from *data
+
+    //get Address from *data
+    Address addr;
+    memcpy(&addr, (Address*)data, sizeof(Address));
+    size -= sizeof(Address);
+    //get heartbeat from *data
+    long heartbeat;
+    memcpy(&heartbeat, (long*)(data + sizeof(Address)), sizeof(long));
+    size -= sizeof(long);
+    //get members and put them into own list
+        //what is the size?
+    int numberOfEntries = size / ( sizeof(int) + sizeof(short) + sizeof(long) );
+    for (int i = 0; i < numberOfEntries; i++) {
+        int id;
+        short port;
+        long heartbeat;
+        int timestamp;
+        memcpy(&id, data, sizeof(int));
+        memcpy(&port, data + sizeof(int), sizeof(port));
+        memcpy(&heartbeat, data + sizeof(int) + sizeof(port), sizeof(long));    //<--- are these what was sent in sendMembershipList?
+        memcpy(&timestamp, data + sizeof(int) + sizeof(port) + sizeof(long), sizeof(int)); //<--should this be local time?
+
+        MemberListEntry entry(id, port, heartbeat, timestamp);
+        memberNode->memberList.push_back((entry));
+    }
+
+
+
     //2. updateMembershipList
     return true;
 }
