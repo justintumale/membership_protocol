@@ -230,7 +230,8 @@ bool MP1Node::recvCallBack(void *env, char *data, int size ) {
         return joinRepHandler(env, data + sizeof(MessageHdr),
                               size); //no need for the msgType anymore, so move address right
     } else if (msgType == HEARTBEAT) {
-        cout << "HEARTBEAT RECEIVED * * * * * ** * **" << endl;
+        cout << "HEARTBEAT * * * * * ** * **" << endl;
+        return heartbeatHandler(env, data + sizeof(MessageHdr), size);
     } else {
         cout << "other ---------" << endl;
         return false;
@@ -281,6 +282,18 @@ bool MP1Node::joinRepHandler(void *env, char *data, int size) {
     cout << "start joinRepHandler..." << endl;
     recvMembershipList(env, data, size);
     cout << "...end joinRepHandler." << endl;
+    return true;
+}
+
+/**
+ * FUNCTION NAME: heartbeatHandler
+ *
+ * DESCRIPTION: Handler for HEARTBEAT messages
+ */
+bool MP1Node::heartbeatHandler(void *env, char *data, int size) {
+    cout << "start heartbeatHandler..." << endl;
+    recvMembershipList(env, data, size);
+    cout << "...end heartbeatHandler." << endl;
     return true;
 }
 
