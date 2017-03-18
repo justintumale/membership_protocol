@@ -227,7 +227,10 @@ bool MP1Node::recvCallBack(void *env, char *data, int size ) {
         return joinReqHandler(env, data+sizeof(MessageHdr), size); //no need for the msgType anymore, so move address right
     } else if (msgType == JOINREP) {
         cout << "JOINREP -----------------" << endl;
-        return joinRepHandler(env, data+sizeof(MessageHdr), size); //no need for the msgType anymore, so move address right
+        return joinRepHandler(env, data + sizeof(MessageHdr),
+                              size); //no need for the msgType anymore, so move address right
+    } else if (msgType == HEARTBEAT) {
+        cout << "HEARTBEAT RECEIVED * * * * * ** * **" << endl;
     } else {
         cout << "other ---------" << endl;
         return false;
@@ -251,8 +254,6 @@ bool MP1Node::joinReqHandler(void *env, char *data, int size) {
     cout << requesterAddress.getAddress() << endl;
     long heartbeat;
     memcpy(&heartbeat, data+sizeof(getMemberNode()->addr.addr), sizeof(long));
-    //cout << "heartbeat: ";
-    //cout<< heartbeat << endl;
 
     //memberListEntries will be updated. They require an id (int), port (short), heartbeat (long), and ts (long)
     //get the id and port from the data
@@ -278,63 +279,7 @@ bool MP1Node::joinReqHandler(void *env, char *data, int size) {
  */
 bool MP1Node::joinRepHandler(void *env, char *data, int size) {
     cout << "start joinRepHandler..." << endl;
-    //1. extract data from *data
-
-    //get Address from *data
-    Address addr;
-    memcpy(&addr, (Address*)data, sizeof(Address));
-    size -= sizeof(Address);
-    //get heartbeat from *data
-    long heartbeat;
-    memcpy(&heartbeat, (long*)(data + sizeof(Address)), sizeof(long));
-    size -= sizeof(long);
-    //get members and put them into own list
-        //what is the size?
-    int numberOfEntries = size / ( sizeof(int) + sizeof(short) + sizeof(long) );
-
-    //clear vector if not empty, since nodes being introduced/reintroduced should be empty
-    if (memberNode->memberList.size() > 0) {
-        memberNode->memberList.clear();
-    }
-
-    MemberListEntry entry;
-
-    for (int i = 0; i < numberOfEntries; i++) {
-        int id;
-        short port;
-        long heartbeat;
-        int timestamp;
-
-        /*
-        memcpy(&id, data, sizeof(int));
-        memcpy(&port, data + sizeof(int), sizeof(port));
-        memcpy(&heartbeat, data + sizeof(int) + sizeof(port), sizeof(long));    //<--- are these what was sent in sendMembershipList?
-        memcpy(&timestamp, data + sizeof(int) + sizeof(port) + sizeof(long), sizeof(long)); //<--should this be local time?
-
-        MemberListEntry entry(id, port, heartbeat, timestamp);
-        */
-
-        memcpy(&entry.id, data, sizeof(int));
-        memcpy(&entry.port, data + sizeof(int), sizeof(port));
-        memcpy(&entry.heartbeat, data + sizeof(int) + sizeof(port), sizeof(long));
-        entry.timestamp = par->getcurrtime();
-
-        memberNode->memberList.push_back((entry));
-
-
-        if (i != numberOfEntries - 1) {
-            data = data + sizeof(int) + sizeof(port) + sizeof(long);
-        }
-    }
-    cout << "memberNode->memberList.size() ";
-    cout << memberNode->memberList.size() << endl;
-    cout << "printing contents of current node's membership list ..." << endl;
-
-
-    for (int i = 0; i < numberOfEntries; i++) {
-        cout << memberNode->memberList[i].getid() << endl;
-    }
-
+    recvMembershipList(env, data, size);
     cout << "...end joinRepHandler." << endl;
     return true;
 }
@@ -380,21 +325,6 @@ void MP1Node::sendMembershipList(int id, short port, long heartbeat, Address *to
      * int id, short port, long heartbeat, long timestamp
      */
 
-
-    /* this is how messages are created and sent:
-     *
-     *  size_t msgsize = sizeof(MessageHdr) + sizeof(joinaddr->addr) + sizeof(long) + 1;
-        msg = (MessageHdr *) malloc(msgsize * sizeof(char));
-
-        // create JOINREQ message: format of data is {struct Address myaddr}
-        msg->msgType = JOINREQ;
-        memcpy((char *)(msg+1), &memberNode->addr.addr, sizeof(memberNode->addr.addr));
-        memcpy((char *)(msg+1) + 1 + sizeof(memberNode->addr.addr), &memberNode->heartbeat, sizeof(long));
-
-        // send JOINREQ message to introducer member
-        emulNet->ENsend(&memberNode->addr, joinaddr, (char *)msg, msgsize);
-     *
-     */
     //message size
     long numberOfMembers = memberNode->memberList.size();
     size_t msgsize = sizeof(MessageHdr) + sizeof(getMemberNode()->addr.addr) + sizeof(long)
@@ -434,6 +364,59 @@ void MP1Node::sendMembershipList(int id, short port, long heartbeat, Address *to
 }
 
 /**
+ * FUNCTION NAME: recvMembershipList
+ *
+ * DESCRIPTION: receive a membership list and update this node's own membership list
+ */
+void MP1Node::recvMembershipList(void *env, char *data, int size) {
+    //1. extract data from *data
+
+    //get Address from *data
+    Address addr;
+    memcpy(&addr, (Address*)data, sizeof(Address));
+    size -= sizeof(Address);
+    //get heartbeat from *data
+    long heartbeat;
+    memcpy(&heartbeat, (long*)(data + sizeof(Address)), sizeof(long));
+    size -= sizeof(long);
+    //get members and put them into own list
+    //what is the size?
+    int numberOfEntries = size / ( sizeof(int) + sizeof(short) + sizeof(long) );
+
+    //clear vector if not empty, since nodes being introduced/reintroduced should be empty
+    if (memberNode->memberList.size() > 0) {
+        memberNode->memberList.clear();
+    }
+
+    MemberListEntry entry;
+
+    for (int i = 0; i < numberOfEntries; i++) {
+        int id;
+        short port;
+        long heartbeat;
+        int timestamp;
+
+        memcpy(&entry.id, data, sizeof(int));
+        memcpy(&entry.port, data + sizeof(int), sizeof(port));
+        memcpy(&entry.heartbeat, data + sizeof(int) + sizeof(port), sizeof(long));
+        entry.timestamp = par->getcurrtime();
+
+        memberNode->memberList.push_back((entry));
+
+
+        if (i != numberOfEntries - 1) {
+            data = data + sizeof(int) + sizeof(port) + sizeof(long);
+        }
+    }
+
+    cout << "printing contents of current node's membership list ..." << endl;
+
+
+    for (int i = 0; i < numberOfEntries; i++) {
+        cout << memberNode->memberList[i].getid() << endl;
+    }
+}
+/**
  * FUNCTION NAME: nodeLoopOps
  *
  * DESCRIPTION: Check if any node hasn't responded within a timeout period and then delete
@@ -441,11 +424,44 @@ void MP1Node::sendMembershipList(int id, short port, long heartbeat, Address *to
  * 				Propagate your membership list
  */
 void MP1Node::nodeLoopOps() {
-
+    cout << "begin nodeLoopOps..." << endl;
     /*
      * Your code goes here
      */
 
+    if (memberNode->memberList.size() > 1 && par->getcurrtime() > 3) {
+        long numberOfMembers = memberNode->memberList.size();
+
+
+        vector<MemberListEntry>::iterator itr = memberNode->memberList.begin();
+        while (itr != memberNode->memberList.end()) {
+            if ((par->getcurrtime() - itr->gettimestamp()) > TREMOVE) { //failed node must be removed
+                itr = memberNode->memberList.erase(itr);
+                numberOfMembers--;
+            } else {
+                itr++;
+            }
+        }
+        cout << "new memberlist size: ";
+        cout << memberNode->memberList.size() << endl;
+        if (memberNode->memberList.size() > 1) {
+            //GOSSIP PROTOCOL: Pick random node to deliver the heartbeat to
+            //srand(time(NULL));
+            int randomIndex = rand() % (memberNode->memberList.size() - 1) + 1;
+            //cout << randomIndex % (memberNode->memberList.size() - 1) + 1 << endl;
+
+            MemberListEntry &entry = memberNode->memberList[randomIndex];
+            cout << "entry id: ";
+            //cout << entry.getid() << endl;
+            Address toAddr;
+            memcpy(&toAddr.addr[0], &entry.id, sizeof(int));
+            memcpy(&toAddr.addr[4], &entry.port, sizeof(short));
+
+
+            //updateMembershipList(id, port, heartbeat);
+            sendMembershipList(entry.id, entry.port, entry.heartbeat+1, &toAddr, HEARTBEAT);
+        }
+    }
     return;
 }
 
