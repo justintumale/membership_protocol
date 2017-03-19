@@ -236,8 +236,6 @@ bool MP1Node::recvCallBack(void *env, char *data, int size ) {
         cout << "other ---------" << endl;
         return false;
     }
-
-    return false;
 }
 
 /**
@@ -325,6 +323,33 @@ void MP1Node::updateMembershipList(int id, short port, long heartbeat) {
     }
     MemberListEntry entry(id, port, heartbeat, par->getcurrtime());
     memberNode->memberList.push_back(entry);
+}
+
+/**
+ * FUNCTION NAME: updateMembershipList
+ *
+ * DESCRIPTION: update the membership list
+ */
+void MP1Node::updateMembershipList(long heartbeat) {
+    cout << "updating memberlist" << endl;
+    int sizeOfMemberList = this->memberNode->memberList.size();
+    for (int i = 0; i < sizeOfMemberList; i++) {
+        cout << "heartbeat ";
+        cout << heartbeat << endl;
+        cout << memberNode->memberList[i].getheartbeat();
+        if (heartbeat >= memberNode->memberList[i].getheartbeat()) {
+            cout << "setting [ id: ";
+            cout << memberNode->memberList[i].getid();
+            cout << " port: ";
+            cout << memberNode->memberList[i].getport();
+            cout << " ] to timestamp: ";
+            cout << par->getcurrtime() << endl;
+            memberNode->memberList[i].setheartbeat(heartbeat);
+            memberNode->memberList[i].settimestamp(par->getcurrtime());
+        } else {
+            cout << "no heartbeat updates." << endl;
+        }
+    }
 }
 
 /**
@@ -471,7 +496,7 @@ void MP1Node::nodeLoopOps() {
             memcpy(&toAddr.addr[4], &entry.port, sizeof(short));
 
 
-            //updateMembershipList(id, port, heartbeat);
+            updateMembershipList(memberNode->heartbeat);
             sendMembershipList(entry.id, entry.port, entry.heartbeat+1, &toAddr, HEARTBEAT);
         }
     }
