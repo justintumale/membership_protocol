@@ -246,7 +246,7 @@ bool MP1Node::recvCallBack(void *env, char *data, int size ) {
         return heartbeatReqHandler(env, data + sizeof(MessageHdr), size - sizeof(MessageHdr));
     } else if (msgType == HEARTBEATREP){
         cout << "HEARTBEATREP * * * * * ** * **" << endl;
-        return false;
+        return heartbeatRepHandler(env, data + sizeof(MessageHdr), size - sizeof(MessageHdr));
     } else {
         cout << "other ---------" << endl;
         return false;
@@ -316,13 +316,22 @@ bool MP1Node::heartbeatReqHandler(void *env, char *data, int size) {
     if (!memberNode->inGroup) {
         return false;
     }
-    cout << "start heartbeatHandler..." << endl;
+    cout << "start heartbeatReqHandler..." << endl;
     Address addr;
     memcpy(&addr, (Address*)data, sizeof(Address));
     data += sizeof(Address);
     size -= sizeof(Address);
     recvMembershipList(env, data, size);
-    cout << "...end heartbeatHandler." << endl;
+
+    MessageHdr *msg;
+    size_t msgSize = sizeof(MessageHdr) + sizeof(memberNode->addr.addr);
+    msg = (MessageHdr*) malloc (msgSize);
+    msg->msgType = HEARTBEATREP;
+    memcpy((char*)(msg + 1), &memberNode->addr.addr, sizeof(memberNode->addr.addr));
+
+    emulNet->ENsend(&memberNode->addr, &addr,(char*)msg, msgSize);
+    free(msg);
+    cout << "...end heartbeatReqHandler." << endl;
     return true;
 }
 
@@ -335,13 +344,13 @@ bool MP1Node::heartbeatRepHandler(void *env, char *data, int size) {
     if (!memberNode->inGroup) {
         return false;
     }
-    cout << "start heartbeatHandler..." << endl;
+    cout << "start heartbeatRepHandler..." << endl;
     Address addr;
     memcpy(&addr, (Address*)data, sizeof(Address));
     data += sizeof(Address);
     size -= sizeof(Address);
     recvMembershipList(env, data, size);
-    cout << "...end heartbeatHandler." << endl;
+    cout << "...end heartbeatRepHandler." << endl;
     return true;
 }
 
@@ -462,6 +471,9 @@ void MP1Node::sendMembershipList(Address *to, enum MsgTypes msgType) {
  * DESCRIPTION: receive a membership list and update this node's own membership list
  */
 void MP1Node::recvMembershipList(void *env, char *data, int size) {
+    if (size < (sizeof(int) + sizeof(short) + sizeof(long))) {
+        return;
+    }
     //get heartbeat from *data
     long heartbeat;
     memcpy(&heartbeat, (long*)(data + sizeof(Address)), sizeof(long));
