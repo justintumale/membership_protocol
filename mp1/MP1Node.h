@@ -76,7 +76,8 @@ public:
     bool recvCallBack(void *env, char *data, int size);
     bool joinReqHandler(void *env, char *data, int size);
     bool joinRepHandler(void *env, char *data, int size);
-    bool heartbeatHandler(void *env, char *data, int size);
+    bool heartbeatReqHandler(void *env, char *data, int size);
+    bool heartbeatRepHandler(void *env, char *data, int size);
     void updateMembershipList(int id, short port, long heartbeat);
     void updateMembershipList(long heartbeat);
     void updateMembershipList(MemberListEntry& entry);

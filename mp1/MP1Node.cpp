@@ -243,7 +243,7 @@ bool MP1Node::recvCallBack(void *env, char *data, int size ) {
                               size - sizeof(MessageHdr)); //no need for the msgType anymore, so move address right
     } else if (msgType == HEARTBEATREQ) {
         cout << "HEARTBEATREQ * * * * * ** * **" << endl;
-        return heartbeatHandler(env, data + sizeof(MessageHdr), size - sizeof(MessageHdr));
+        return heartbeatReqHandler(env, data + sizeof(MessageHdr), size - sizeof(MessageHdr));
     } else if (msgType == HEARTBEATREP){
         cout << "HEARTBEATREP * * * * * ** * **" << endl;
         return false;
@@ -308,11 +308,30 @@ bool MP1Node::joinRepHandler(void *env, char *data, int size) {
 }
 
 /**
- * FUNCTION NAME: heartbeatHandler
+ * FUNCTION NAME: heartbeatReqHandler
  *
  * DESCRIPTION: Handler for HEARTBEAT messages
  */
-bool MP1Node::heartbeatHandler(void *env, char *data, int size) {
+bool MP1Node::heartbeatReqHandler(void *env, char *data, int size) {
+    if (!memberNode->inGroup) {
+        return false;
+    }
+    cout << "start heartbeatHandler..." << endl;
+    Address addr;
+    memcpy(&addr, (Address*)data, sizeof(Address));
+    data += sizeof(Address);
+    size -= sizeof(Address);
+    recvMembershipList(env, data, size);
+    cout << "...end heartbeatHandler." << endl;
+    return true;
+}
+
+/**
+ * FUNCTION NAME: heartbeatRepHandler
+ *
+ * DESCRIPTION: Handler for HEARTBEAT messages
+ */
+bool MP1Node::heartbeatRepHandler(void *env, char *data, int size) {
     if (!memberNode->inGroup) {
         return false;
     }
@@ -378,45 +397,35 @@ void MP1Node::sendMembershipList(Address *to, enum MsgTypes msgType) {
     size_t msgsize = sizeof(MessageHdr) + sizeof(Address) + sizeof(long) + (numberOfMembers * (sizeof(int) + sizeof(short) + sizeof(long)));
 
     //malloc memory space for the header
-    cout << "1" << endl;
     MessageHdr* msg = (MessageHdr *) malloc(msgsize);
 
     //msg will be a pointer to an address
-    cout << "2" << endl;
     char* data = (char*) (msg + 1);
 
     //set the message type
-    cout << "3" << endl;
     msg->msgType = msgType;
 
     //set this node's address into the message
-    cout << "4" << endl;
     memcpy(data, &memberNode->addr.addr, sizeof(memberNode->addr.addr));
     data += sizeof(memberNode->addr.addr);
 
     //set the number of members (for now)
-    cout << "5" << endl;
     char* numberOfMembersPtr = data;
     memcpy(numberOfMembersPtr, &numberOfMembers, sizeof(long));
     data += sizeof(long);
 
-    cout << "6" << endl;
     //set the members in list and delete members that have failed
-    int counter = 0;
     for (vector<MemberListEntry>::iterator entry = memberNode->memberList.begin(); entry != memberNode->memberList.end();) {
-        cout << "COUNTER: " << endl;
-        cout << counter << endl;
         if (entry != memberNode->memberList.begin()) {
             if (par->getcurrtime() - entry->timestamp > TREMOVE) {
 #ifdef DEBUGLOG
-                /*
+
                 Address toAddr;
                 memcpy(&toAddr.addr[0], &entry->id, sizeof(int));
                 memcpy(&toAddr.addr[4], &entry->port, sizeof(short));
                 log->logNodeRemove(&memberNode->addr, &toAddr);
                 cout << "REMOVING          ";
                 cout << toAddr.getAddress() << endl;
-                 */
 #endif
                 cout << "erase?" << endl;
                 entry = memberNode->memberList.erase(entry);
@@ -428,24 +437,18 @@ void MP1Node::sendMembershipList(Address *to, enum MsgTypes msgType) {
                 continue;
             }
         }
-        cout << "7" << endl;
         memcpy(data, &entry->id, sizeof(int));
         data += sizeof(int);
-        cout << "8" << endl;
         memcpy(data, &entry->port, sizeof(short));
         data += sizeof(short);
-        cout << "9" << endl;
         memcpy(data, &entry->heartbeat, sizeof(long));
         ++entry;
     }
 
     //set new number of members members were deleted
-    cout << "10" << endl;
     memcpy(numberOfMembersPtr, &numberOfMembers, sizeof(long));
     //readjust message size if members were deleted
-    cout << "11" << endl;
     msgsize = sizeof(MessageHdr) + sizeof(Address) + sizeof(long) + (numberOfMembers * (sizeof(int) + sizeof(short) + sizeof(long)));
-
 
     cout << "...end sendMembershipList." << endl;
 
