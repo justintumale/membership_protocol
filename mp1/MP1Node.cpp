@@ -344,14 +344,21 @@ bool MP1Node::heartbeatRepHandler(void *env, char *data, int size) {
     if (!memberNode->inGroup) {
         return false;
     }
-    cout << "start heartbeatRepHandler..." << endl;
-    Address addr;
-    memcpy(&addr, (Address*)data, sizeof(Address));
-    data += sizeof(Address);
-    size -= sizeof(Address);
-    recvMembershipList(env, data, size);
-    cout << "...end heartbeatRepHandler." << endl;
-    return true;
+    Address replierAddr;
+    memcpy(&replierAddr, data, sizeof(memberNode->addr));
+
+    int id = getIdFromAddress(replierAddr.getAddress());
+    short port = getPortFromAddress(replierAddr.getAddress());
+
+    for (vector<MemberListEntry>::iterator entry = memberNode->memberList.begin(); entry != memberNode->memberList.end(); entry++) {
+        if (entry->id == id && entry->port == port) {
+            entry->settimestamp( par->getcurrtime() );
+            entry->setheartbeat( entry->getheartbeat() + 1 );
+            return true;
+        }
+    }
+
+    return false;
 }
 
 /**
