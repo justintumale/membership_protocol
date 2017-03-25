@@ -31,7 +31,8 @@
 enum MsgTypes{
     JOINREQ,
     JOINREP,
-    HEARTBEAT,
+    HEARTBEATREQ,
+    HEARTBEATREP,
     DUMMYLASTMSGTYPE
 };
 
@@ -79,7 +80,7 @@ public:
     void updateMembershipList(int id, short port, long heartbeat);
     void updateMembershipList(long heartbeat);
     void updateMembershipList(MemberListEntry& entry);
-    void sendMembershipList(int id, short port, long heartbeat, Address *to, enum MsgTypes msgType);
+    void sendMembershipList(Address *to, enum MsgTypes msgType);
     void recvMembershipList(void *env, char *data, int size);
     void nodeLoopOps();
     int isNullAddress(Address *addr);
