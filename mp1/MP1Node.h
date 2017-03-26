@@ -3,6 +3,11 @@
  *
  * DESCRIPTION: Membership protocol run by this Node.
  * 				Header file of MP1Node class.
+ *
+ * 	Justin Tumale
+ * 	Coursera Cloud Computing 1
+ * 	Membership Protocol Assignment
+ * 	3/25/2017
  **********************************/
 
 #ifndef _MP1NODE_H_
@@ -73,17 +78,23 @@ public:
     void checkMessages();
     int getIdFromAddress(string address);
     short getPortFromAddress(string address);
+
     bool recvCallBack(void *env, char *data, int size);
+
     bool joinReqHandler(void *env, char *data, int size);
     bool joinRepHandler(void *env, char *data, int size);
+
     bool heartbeatReqHandler(void *env, char *data, int size);
     bool heartbeatRepHandler(void *env, char *data, int size);
+
     void updateMembershipList(int id, short port, long heartbeat);
-    void updateMembershipList(long heartbeat);
     void updateMembershipList(MemberListEntry& entry);
+
     void sendMembershipList(Address *to, enum MsgTypes msgType);
-    void recvMembershipList(void *env, char *data, int size);
+    bool recvMembershipList(void *env, char *data, int size, const char * label);
+
     void nodeLoopOps();
+
     int isNullAddress(Address *addr);
     Address getJoinAddress();
     void initMemberListTable(Member *memberNode);
